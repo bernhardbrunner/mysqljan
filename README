@@ -1,38 +1,8 @@
-#!/bin/sh
-#Last modified: 2010/10/04 10:02
-#Synopsis: creates a backup of all mysql database files and optimizes all tables
-#Prerequisites: mysqlhotcopy and mysqlcheck must be installed
-#Usage: 
-# copy and change this file to /root/bin
-# test it from the command line
-# link the file into e.g. /etc/cron.daily
-#
-#config vars, adapt to your system
-backupdir="/home/USER/mysqlbackup"
-myuser="USER"
-mypasswd="PASSWORD"
+Synopsis: creates a backup of all mysql database files and optimizes all tables
+Prerequisites: mysqlhotcopy and mysqlcheck must be installed
+Usage: 
+ copy and change this file to /root/bin
+ test it from the command line
+ link the file into e.g. /etc/cron.daily
 
-# setup variables needed
-tmproot="/tmp"
-tmpdir="mysql"
-tmpdir="$tmproot/$tmpdir"
-mkdir $tmpdir
-date=`date -I`
 
-# Get the list of MySQL Databases & copy them
-for var in `find /var/lib/mysql/ -type d | \
-sed -e "s/\/var\/lib\/mysql\///"`; do
-  mysqlhotcopy -u $myuser -p $mypasswd -q "$var" $tmpdir
-  echo done $var
-done
-
-# Tar/gzip data
-tar czf $backupdir/$date-mysql.tar.gz -C $tmproot $tmpdir
-
-# Move the data to FS1
-
-# Delete temp files
-rm -fR /tmp/mysql/
-
-# Optimize all tables
-mysqlcheck --user=$myuser --password="$mypasswd" -o --all-databases
